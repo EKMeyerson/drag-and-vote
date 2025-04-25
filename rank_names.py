@@ -37,7 +37,8 @@ items = [
 'synapse',
 'tarot',
 'tesseract',
-'unileaf'
+'unileaf',
+'caid'
 ]
 
 # Ensure the CSV exists
