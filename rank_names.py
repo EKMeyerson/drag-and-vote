@@ -3,6 +3,8 @@ import pandas as pd
 import datetime
 import os
 from streamlit_sortables import sort_items
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
 # List of items to rank
 items = [
@@ -72,6 +74,19 @@ if not st.session_state.submitted:
                 "item": ranked_items,
             })
             df.to_csv("responses.csv", mode='a', header=False, index=False)
+
+            # Update google sheet
+            scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+            creds = ServiceAccountCredentials.from_json_keyfile_dict(st.secrets["google"], scope)
+            client = gspread.authorize(creds)
+            sheet = client.open("Rank Names").sheet1
+
+            # Append rows
+            sheet.append_rows(
+                [[timestamp, name, i+1, item] for i, item in enumerate(ranked_items)]
+            )
+
+
             st.success("✅ Ranking submitted!")
             st.session_state.submitted = True
 else:
